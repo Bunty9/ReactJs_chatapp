@@ -9,7 +9,7 @@ import Input from '../Input/Input';
 
 import './Chat.css';
 
-const ENDPOINT = '';      // server endpoint
+const ENDPOINT = 'http://localhost:5000/';      // server endpoint
 
 
 const Chat= ({location}) => {
