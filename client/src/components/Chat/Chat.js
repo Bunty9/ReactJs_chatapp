@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import queryString from 'query-string';
-import io from "socket.io-client";
+import { io } from "socket.io-client";
+import './Chat.css';
 
-import TextContainer from '../TextContainer/TextContainer';
 import Messages from '../Messages/Messages';
 import InfoBar from '../InfoBar/InfoBar';
 import Input from '../Input/Input';
 
-import './Chat.css';
 
-const ENDPOINT = 'http://localhost:5000/';      // server endpoint
+const ENDPOINT = "http://localhost:5000/"      // server endpoint
 
+let socket ;
 
 const Chat= ({location}) => {
     const [name, setName] = useState('');
@@ -21,7 +21,8 @@ const Chat= ({location}) => {
 
     useEffect(() => {
         const { name, room } = queryString.parse(location.search);
-        socket = io(ENDPOINT);
+        socket = io(ENDPOINT,{ transports: ['websocket', 'polling', 'flashsocket'] });
+
         setRoom(room);
         setName(name)
         socket.emit('join', { name, room }, (error) => {
@@ -32,11 +33,11 @@ const Chat= ({location}) => {
     }, [ENDPOINT, location.search]);
 
     useEffect(() => {
-        socket.on('message', message => {
+        socket.io.on('message', message => {
           setMessages(messages => [ ...messages, message ]);
         });
         
-        socket.on("roomData", ({ users }) => {
+        socket.io.on("roomData", ({ users }) => {
           setUsers(users);
         });
     }, []);
@@ -51,13 +52,13 @@ const Chat= ({location}) => {
     
 
     return (
-        <div>
+      <div className="outerContainer">
             <div className="container">
                 <InfoBar room={room} />
                 <Messages messages={messages} name={name} />
                 <Input message={message} setMessage={setMessage} sendMessage={sendMessage} />
             </div>
-            <TextContainer users={users}/>
+            {/* <TextContainer users={users}/> */}
         </div>
     )
 }
